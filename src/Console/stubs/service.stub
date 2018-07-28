@@ -1,0 +1,78 @@
+<?php
+namespace App\Services;
+
+use App\Models\RssPosts as RPModel;
+use App\Models\RssFeed as RFModel;
+use League\Flysystem\Exception;
+use DB;
+
+class DummyClassService
+{
+    public function getMany($query)
+    {
+        $tags = config('hwnews.tag');
+
+        $category = isset($query['category']) && $query['category'] ? intval($query['category']) : 1;
+
+
+        $validator = \Validator::make($query, [
+            'feed_id'  => 'nullable|integer|min:1',
+            'tag'      => 'nullable|integer',
+            'category' => 'nullable|integer|min:1|in:' . implode(array_keys($tags), ','),
+            's_time'   => 'nullable|date',
+            'e_time'   => 'nullable|date',
+        ]);
+
+
+        if ($validator->fails()) {
+            abort(404);
+        }
+
+
+        $list = RPModel::select(DB::Raw('id, title, link as source_url, feed_id as category_id, categories as tags, created_at, count_like, view_count as count_view'))
+//            ->with('feed')
+            ->orderBy('created_at', 'desc');
+
+        if (isset($query['feed_id']) && $query['feed_id']) {
+            $list->where('feed_id', $query['feed_id']);
+        }
+
+
+        if (isset($query['s_time']) && $query['s_time']) {
+            $list->where('created_at', '<', $query['s_time']);
+        }
+
+        if (isset($query['e_time']) && $query['e_time']) {
+            $list->where('created_at', '>', $query['e_time']);
+        }
+
+        $feed_ids = RFModel::where('category', $category)->pluck('id');
+        $list->whereIn('feed_id', $feed_ids);
+
+
+        if (isset($query['tag']) && $query['tag'] && isset($tags[$category][$query['tag']])) {
+            $list->where('categories', 'like', '%' . $tags[$query['category']][$query['tag']] . '%');
+        }
+
+        $list = $list->paginate(20)->appends($query);
+
+        return $list;
+    }
+
+    public function getOne($id)
+    {
+
+        $id = intval($id);
+
+
+        $post = RPModel::select(DB::Raw('id, title, link as source_url, feed_id as category_id, categories as tags, count_like, view_count as count_view, content, created_at,  updated_at'))->find($id);
+
+        if (!$post) {
+            throw new Exception('文章不存在', 20000);
+        }
+
+        RPModel::where('id', $id)->increment('view_count');
+
+        return $post;
+    }
+}

@@ -1,0 +1,210 @@
+<?php
+
+namespace {{{$DummyNamespace}}};
+
+use Illuminate\Http\Request;
+use DummyRootNamespaceHttp\Controllers\Controller;
+
+@foreach ($use_models as $table)
+use {{{$DummyNamespace}}}\{{{ucwords($table)}}} . ' as ' . {{{ucwords($table)}}} . "Model;\n";
+@endforeach
+
+use {{{$DummyNamespace}}}\{{{$DummyService}}};
+
+class {{{$DummyClass}}} extends Controller
+{
+
+    private $attr = array();
+
+
+    /**
+     * @SWG\Get(
+     *   path="/api/{{{$dummy_class}}}",
+     *   tags={"{{{$DummyClass}}}"},
+     *   summary="列表",
+     *   description="列表描述",
+     *   operationId="{{{$DummyClass}}}@index",
+     *   produces={"application/json"},
+     @foreach ($master_table as $c)
+        @if ($c['Field'] != '')
+     *   @SWG\Parameter(in="query", name="{{{$c['Field']}}}", type="{{{$validator_dict[$c['Type']]}}}", description="{{{$c['Field']}}}", required={{{$c['Field'] ? 'true' : 'false'}}}, default=""),
+        @endif
+     @endforeach
+     *   @SWG\Response(response="200", description="操作成功")
+     * )
+     */
+    public function index(Request $request)
+    {
+        $result = [];
+
+        $query = $this->service->getQueryIndex($request);
+
+        $result = $this->service->getListPaginate($query);
+
+        return $this->returnResponse($result);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+
+    }
+
+    /**
+     * @SWG\Post(
+     *   path="/api/{{{$dummy_class}}}",
+     *   tags={"{{{$DummyClass}}}"},
+     *   summary="创建",
+     *   description="创建描述",
+     *   operationId="{{{$DummyClass}}}@store",
+     *   produces={"application/json"},
+    @foreach ($master_table as $c)
+     *   @SWG\Parameter(in="formData", name="{{{$c['Field']}}}", type="{{{$validator_dict[$c['Type']]}}}", description="{{{$c['Field']}}}", required={{{$c['Field'] ? 'true' : 'false'}}}, default=""),
+    @endforeach
+     *   @SWG\Parameter(in="path", name="id", type="string", description="id", required=true, default="1"),
+     *   @SWG\Response(response="200", description="操作成功")
+     * )
+     */
+    public function store(Request $request)
+    {
+        $result = [];
+
+        $query = $this->service->getQuery();
+
+        if (!empty($query)) {
+            $obj = $this->service->store($query);
+            if ($obj) {
+                $result = [
+                    'id' => $obj->id
+                ];
+            }
+        }
+
+        return $this->returnResponse($result);
+    }
+
+    /**
+     * @SWG\Get(
+     *   path="/api/{{{$dummy_class}}}/{id}",
+     *   tags={"{{{$DummyClass}}}"},
+     *   summary="详情",
+     *   description="详情描述",
+     *   operationId="{{{$DummyClass}}}@show",
+     *   produces={"application/json"},
+     *   @SWG\Parameter(in="path", name="id", type="string", description="id", required=true, default="1"),
+     *   @SWG\Response(response="200", description="操作成功")
+     * )
+     */
+    public function show($id)
+    {
+        $result = [];
+
+        $id = intval($id);
+
+        $result = $this->service->getOne($id);
+
+        return $this->returnResponse($result);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+
+    }
+
+    /**
+     * @SWG\Put(
+     *   path="/api/{{{$dummy_class}}}/{id}",
+     *   tags={"{{{$DummyClass}}}"},
+     *   summary="修改",
+     *   description="修改描述",
+     *   operationId="{{{$DummyClass}}}@update",
+     *   produces={"application/json"},
+     *   @SWG\Parameter(in="path", name="id", type="string", description="id", required=true, default="1"),
+    @foreach ($master_table as $c)
+     *   @SWG\Parameter(in="formData", name="{{{$c['Field']}}}", type="{{{$validator_dict[$c['Type']]}}}", description="{{{$c['Field']}}}", required={{{$c['Field'] ? 'true' : 'false'}}}, default=""),
+    @endforeach
+     *   @SWG\Response(response="200", description="操作成功")
+     * )
+     */
+    public function update(Request $request, $id)
+    {
+        $result = [];
+
+        $query = $this->service->getQuery($request);
+
+        // where 搜索条件
+
+        $obj = $this->service->update($query);
+
+        $result = [
+            'id' => $obj->id
+        ];
+
+        return $this->returnResponse($result);
+    }
+
+    /**
+     * @SWG\Delete(
+     *   path="/api/{{{$dummy_class}}}/{id}",
+     *   tags={"{{{$DummyClass}}}"},
+     *   summary="删除",
+     *   description="删除描述",
+     *   operationId="{{{$DummyClass}}}@destroy",
+     *   produces={"application/json"},
+     *   @SWG\Parameter(in="path", name="id", type="string", description="id", required=true, default="1"),
+     *   @SWG\Response(response="200", description="操作成功")
+     * )
+     */
+    public function destroy($id)
+    {
+       $result = [];
+
+       $id = intval($id);
+
+       $result = $this->service->destroy($id);
+
+       return $this->returnResponse($result);
+    }
+
+    protected function getQuery(Request $request)
+    {
+       $rules = [
+            'name' => '',
+       ];
+
+       return validator_input($rules, $request);
+    }
+
+    protected function getQueryIndex(Request $request)
+    {
+       $rules = [
+           'name' => '',
+       ];
+
+      return validator_input($rules, $request);
+    }
+
+    protected public function __get($name)
+    {
+        if (array_key_exists($name, $this->attr)) {
+            return $this->attr[$name];
+        }
+
+        switch ($name) {
+            case 'service' :
+                $this->attr['service'] = new DummyService();
+        }
+
+        return $this->attr[$name];
+    }
+}
