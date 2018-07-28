@@ -1,5 +1,5 @@
 {
-  "name": "hw798/AutoCoding",
+  "name": "hw798/auto-coding",
   "description": "The Laravel Framework MVC Auto Code",
   "keywords": ["auto code", "laravel", "php"],
   "license": "MIT",
@@ -54,6 +54,12 @@
     "sort-packages": true,
     "optimize-autoloader": true
   },
+  "repositories": [
+    {
+      "type": "git",
+      "url": "git@github.com:hw798/AutoCoding.git"
+    }
+  ],
   "minimum-stability": "dev",
   "prefer-stable": true
 }
