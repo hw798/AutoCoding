@@ -1,6 +1,4 @@
-<?php
-
-namespace Hw798\Support;
+<?php namespace Hw\Support;
 
 use DB;
 

@@ -1,23 +1,17 @@
-<?php
+<?php namespace Hw\Console;
 
-namespace HW798\Console;
+use Illuminate\Console\Command;
 
-use Illuminate\Support\Str;
-use InvalidArgumentException;
-use Illuminate\Console\GeneratorCommand;
-use Symfony\Component\Console\Input\InputOption;
-use Illuminate\Support\Facades\View;
+use Hw\Support\Table;
 
-use Hw798\Support\Table;
-
-class ControllerMakeCommand extends GeneratorCommand
+class ControllerMakeCommand extends Command
 {
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $name = 'hw798:make:controller';
+    protected $name = 'z:controller';
 
     /**
      * The console command description.
