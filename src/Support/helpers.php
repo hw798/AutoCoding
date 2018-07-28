@@ -1,7 +1,5 @@
 <?php
 
-use Validator;
-
 if (! function_exists('validator_input')) {
 
     function validator_input($rules, $input)
@@ -14,7 +12,7 @@ if (! function_exists('validator_input')) {
             'in'      => 'The :attribute must be one of the following types: :values',
         ];
 
-        $validator = Validator::make($input, $rules, $messages);
+        $validator = \Validator::make($input, $rules, $messages);
 
         if ($validator->fails()) {
             throw new Exception($validator->errors()->toString());
