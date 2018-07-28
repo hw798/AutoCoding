@@ -16,14 +16,14 @@ class table
 
     public static function showIndex($table)
     {
-        return DB::query('SHOW INDEX FROM ' . $table);
+        return DB::select('SHOW INDEX FROM ' . $table);
     }
 
 
     public static function showColumns($table)
     {
 
-        return DB::query('SHOW COLUMNS FROM ' . $table);
+        return DB::select('SHOW COLUMNS FROM ' . $table);
     }
 
 }
